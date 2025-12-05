@@ -9,6 +9,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "812e12b5285cc515a9c72a5c1d3b6d46a19dac5acfef5265968c166106e31dd3"
 
 [[package]]
+name = "byteorder"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
+
+[[package]]
 name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -22,8 +28,9 @@ checksum = "40a998414a3656e7a11ca59d55598ce7df58daafd742e783844e80bbd8d500dd"
 
 [[package]]
 name = "estr"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
+ "byteorder",
  "crossfig",
  "libabort",
  "lock_api",

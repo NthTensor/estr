@@ -9,6 +9,11 @@ mod bumpalloc;
 mod cfg;
 mod stringcache;
 
+cfg::std! {
+    mod hash;
+    pub use hash::*;
+}
+
 mod platform {
     use crate::cfg;
 
