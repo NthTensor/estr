@@ -1,9 +1,9 @@
-use super::Estr;
+use core::hash::{BuildHasherDefault, Hasher};
+
 use byteorder::{ByteOrder, NativeEndian};
-use std::{
-    collections::{HashMap, HashSet},
-    hash::{BuildHasherDefault, Hasher},
-};
+use hashbrown::{HashMap, HashSet};
+
+use super::Estr;
 
 /// A standard `HashMap` using `Estr` as the key type with a custom `Hasher`
 /// that just uses the precomputed hash for speed instead of calculating it.

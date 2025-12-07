@@ -7,12 +7,10 @@ extern crate alloc;
 
 mod bumpalloc;
 mod cfg;
+mod collections;
 mod stringcache;
 
-cfg::std! {
-    mod hash;
-    pub use hash::*;
-}
+pub use collections::*;
 
 mod platform {
     use crate::cfg;
@@ -30,10 +28,8 @@ mod platform {
     }
 }
 
-use alloc::{borrow, boxed, fmt, rc, slice, string, sync};
-use core::ops::Deref;
-use core::str::FromStr;
-use core::{cell, cmp, ptr};
+use alloc::{borrow, boxed, fmt, rc, slice, str, string, sync};
+use core::{cell, cmp, hash, ops, ptr};
 
 use crate::platform::Mutex;
 use crate::stringcache::*;
@@ -286,7 +282,7 @@ where
     }
 }
 
-impl FromStr for Estr {
+impl str::FromStr for Estr {
     type Err = ();
 
     #[inline]
@@ -379,7 +375,7 @@ impl Default for Estr {
     }
 }
 
-impl Deref for Estr {
+impl ops::Deref for Estr {
     type Target = str;
     fn deref(&self) -> &Self::Target {
         self.as_str()
@@ -395,6 +391,12 @@ impl fmt::Display for Estr {
 impl fmt::Debug for Estr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "u!({:?})", self.as_str())
+    }
+}
+
+impl hash::Hash for Estr {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        self.digest().hash.hash(state);
     }
 }
 
@@ -439,6 +441,18 @@ impl PartialEq<Estr> for Digest {
 impl PartialOrd<Estr> for Digest {
     fn partial_cmp(&self, other: &Estr) -> Option<cmp::Ordering> {
         Some(self.cmp(&other.digest()))
+    }
+}
+
+impl hash::Hash for Digest {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        self.hash.hash(state);
+    }
+}
+
+impl hashbrown::Equivalent<Estr> for Digest {
+    fn equivalent(&self, key: &Estr) -> bool {
+        key.digest().hash == self.hash
     }
 }
 
