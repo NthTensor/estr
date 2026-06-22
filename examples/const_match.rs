@@ -4,9 +4,9 @@ use estr::*;
 
 fn main() {
     // think of this as some runtime string that is not known at compile time
-    let some_string = String::from("bar");
+    let some_string = estr("bar");
 
-    match digest(&some_string).hash() {
+    match &some_string.digest().hash() {
         ehash!("foo") => {
             println!("got a foo!");
         }
