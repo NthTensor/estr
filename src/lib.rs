@@ -11,6 +11,7 @@ mod collections;
 mod stringcache;
 
 pub use collections::*;
+pub use estr_macros::*;
 
 mod platform {
     use crate::cfg;
