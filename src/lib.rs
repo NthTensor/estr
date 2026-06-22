@@ -415,7 +415,7 @@ pub struct Digest {
 }
 
 impl Digest {
-    pub fn hash(&self) -> u64 {
+    pub const fn hash(&self) -> u64 {
         self.hash
     }
 }
