@@ -1,4 +1,4 @@
-use proc_macro::{TokenStream, TokenTree, Literal};
+use proc_macro::{Literal, TokenStream, TokenTree};
 
 /// Computes an estr-compatible hash for the given string literal.
 /// This is equivalent to calling `digest("something").hash()`, with the added benefit
@@ -11,7 +11,7 @@ use proc_macro::{TokenStream, TokenTree, Literal};
 /// # let some_string_hash = ehash!("bar");
 /// // assume we got `some_string_hash` through some runtime string,
 /// // e.g. via
-/// // let some_string_hash = estr(some_string).digest().hash();
+/// // let some_string_hash = estr(some_string).hash();
 ///
 /// match some_string_hash {
 ///     ehash!("foo") => {
@@ -38,12 +38,16 @@ pub fn ehash(input: TokenStream) -> TokenStream {
 
     // strip the surrounding quotes
     let s = lit.to_string();
-    let s = s.strip_prefix('"').and_then(|s| s.strip_suffix('"'))
+    let s = s
+        .strip_prefix('"')
+        .and_then(|s| s.strip_suffix('"'))
         .expect("ehash! expects a string literal");
 
     // Keep this in sync with `digest`
     let hash = rapidhash::v3::rapidhash_v3_nano_inline::<true, false>;
     let seed = &rapidhash::v3::DEFAULT_RAPID_SECRETS;
     let value = hash(s.as_bytes(), seed);
-    TokenStream::from(TokenTree::Literal(Literal::u64_suffixed(value))).into_iter().collect()
+    TokenStream::from(TokenTree::Literal(Literal::u64_suffixed(value)))
+        .into_iter()
+        .collect()
 }

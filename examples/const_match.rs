@@ -6,7 +6,7 @@ fn main() {
     // think of this as some runtime string that is not known at compile time
     let some_string = estr("bar");
 
-    match &some_string.digest().hash() {
+    match &some_string.hash() {
         ehash!("foo") => {
             println!("got a foo!");
         }

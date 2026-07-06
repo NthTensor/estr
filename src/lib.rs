@@ -113,10 +113,8 @@ impl Estr {
 
     /// Get the precomputed hash for this string.
     #[inline]
-    pub fn digest(&self) -> Digest {
-        Digest {
-            hash: self.as_string_cache_entry().hash,
-        }
+    pub fn hash(&self) -> u64 {
+        self.as_string_cache_entry().hash
     }
 
     /// Get an owned String copy of this string.
@@ -139,7 +137,7 @@ impl PartialOrd for Estr {
 
 impl Ord for Estr {
     fn cmp(&self, other: &Self) -> cmp::Ordering {
-        self.digest().cmp(&other.digest())
+        self.hash().cmp(&other.hash())
     }
 }
 
@@ -397,7 +395,7 @@ impl fmt::Debug for Estr {
 
 impl hash::Hash for Estr {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        self.digest().hash.hash(state);
+        self.hash().hash(state);
     }
 }
 
@@ -410,6 +408,8 @@ pub const fn digest(string: &str) -> Digest {
     }
 }
 
+/// The hash of an estr. This can be used in `EstrMap` lookups, and is const
+/// constructable.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Digest {
     hash: u64,
@@ -422,26 +422,26 @@ impl Digest {
 }
 
 impl PartialEq<Digest> for Estr {
-    fn eq(&self, other: &Digest) -> bool {
-        self.digest() == *other
+    fn eq(&self, digest: &Digest) -> bool {
+        self.hash() == digest.hash
     }
 }
 
 impl PartialOrd<Digest> for Estr {
-    fn partial_cmp(&self, other: &Digest) -> Option<cmp::Ordering> {
-        Some(self.digest().cmp(other))
+    fn partial_cmp(&self, digest: &Digest) -> Option<cmp::Ordering> {
+        Some(self.hash().cmp(&digest.hash))
     }
 }
 
 impl PartialEq<Estr> for Digest {
-    fn eq(&self, other: &Estr) -> bool {
-        *self == other.digest()
+    fn eq(&self, estr: &Estr) -> bool {
+        self.hash == estr.hash()
     }
 }
 
 impl PartialOrd<Estr> for Digest {
-    fn partial_cmp(&self, other: &Estr) -> Option<cmp::Ordering> {
-        Some(self.cmp(&other.digest()))
+    fn partial_cmp(&self, estr: &Estr) -> Option<cmp::Ordering> {
+        Some(self.hash.cmp(&estr.hash()))
     }
 }
 
@@ -453,7 +453,7 @@ impl hash::Hash for Digest {
 
 impl hashbrown::Equivalent<Estr> for Digest {
     fn equivalent(&self, key: &Estr) -> bool {
-        key.digest().hash == self.hash
+        key.hash() == self.hash
     }
 }
 
@@ -501,13 +501,15 @@ fn whichbin(hash: u64) -> usize {
     ((hash >> TOP_SHIFT as u64) % NUM_BINS as u64) as usize
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn validate_that_digest_and_ehash_produce_the_same_hash() {
-        assert_eq!(digest("the quick brown fox").hash(), ehash!("the quick brown fox"));
+        assert_eq!(
+            digest("the quick brown fox").hash(),
+            ehash!("the quick brown fox")
+        );
     }
 }
