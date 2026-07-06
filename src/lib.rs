@@ -11,6 +11,7 @@ mod collections;
 mod stringcache;
 
 pub use collections::*;
+pub use estr_macros::*;
 
 mod platform {
     use crate::cfg;
@@ -409,13 +410,13 @@ pub const fn digest(string: &str) -> Digest {
     }
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Digest {
     hash: u64,
 }
 
 impl Digest {
-    pub fn hash(&self) -> u64 {
+    pub const fn hash(&self) -> u64 {
         self.hash
     }
 }
@@ -498,4 +499,15 @@ static STRING_CACHE: [Mutex<cell::LazyCell<StringCache>>; NUM_BINS] =
 #[inline]
 fn whichbin(hash: u64) -> usize {
     ((hash >> TOP_SHIFT as u64) % NUM_BINS as u64) as usize
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_that_digest_and_ehash_produce_the_same_hash() {
+        assert_eq!(digest("the quick brown fox").hash(), ehash!("the quick brown fox"));
+    }
 }
