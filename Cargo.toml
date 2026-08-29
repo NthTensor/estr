@@ -5,6 +5,7 @@ edition = "2024"
 rust-version = "1.89"
 license = "BSD-2-Clause-Patent"
 description = "A no_std and const capable fork of Ustr"
+documentation = "https://docs.rs/estr"
 repository = "https://github.com/NthTensor/estr"
 
 [dependencies]
